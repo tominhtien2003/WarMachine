@@ -3,14 +3,21 @@ using UnityEngine;
 public class TankerController : MonoBehaviour
 {
     [SerializeField] Transform[] wheels;
+    [SerializeField] Transform gunTransform;
     [SerializeField] float speedRotateWheel;
     [SerializeField] GameInput gameInput;
 
 
     private Vector2 inputVector;
+    private bool isRotatingGun;
+    private Vector3 lastMousePosition;
     private void Start()
     {
-        
+        lastMousePosition = Vector3.zero;
+    }
+    private void Update()
+    {
+        RotateGun();
     }
     private void FixedUpdate()
     {
@@ -49,5 +56,23 @@ public class TankerController : MonoBehaviour
     {
         inputVector = gameInput.GetInputVectorNormalizeOfPlayer();
         return inputVector != Vector2.zero;
+    }
+    private void RotateGun()
+    {
+        if (!isRotatingGun && Input.GetMouseButtonDown(0))
+        {
+            isRotatingGun = true;
+        }
+        else if (Input.GetMouseButtonUp(0))
+        {
+            isRotatingGun= false;
+        }
+        if (isRotatingGun)
+        {
+            Vector3 currentMousePosition = Input.mousePosition;
+            float rotateDirection = (currentMousePosition - lastMousePosition).normalized.x;
+            gunTransform.Rotate(0f, rotateDirection * Time.deltaTime * 50f, 0f);
+            lastMousePosition = currentMousePosition;
+        }
     }
 }
